@@ -50,6 +50,13 @@ class TestProcessor {
   // Create individual test item
   createTestItem(testId) {
     const test = TestDatabase.tests[testId];
+
+    // Skip if test definition doesn't exist
+    if (!test) {
+      console.warn(`Test ${testId} not found in database`);
+      return '';
+    }
+
     const result = this.testResults.get(testId);
     const statusClass = result ? `test-${result.status}` : "";
     const statusIcon = this.getStatusIcon(result?.status);
@@ -330,20 +337,40 @@ class TestProcessor {
 
   // Generate summary
   generateSummary(results) {
+    // If no results passed, use internal testResults
+    if (!results) {
+      results = Array.from(this.testResults.values());
+    }
+
     const summary = {
-      pass: 0,
-      fail: 0,
+      totalTests: Object.keys(TestDatabase.tests).length,
+      passed: 0,
+      failed: 0,
       dna: 0,
       notTested: 0,
+      completion: 0,
+      results: []
     };
 
     results.forEach((result) => {
+      const test = TestDatabase.tests[result.testId];
+
+      // Add to results array for display
+      summary.results.push({
+        testId: result.testId,
+        testName: test ? test.title : result.testId,
+        status: result.status,
+        notes: result.notes,
+        timestamp: result.timestamp
+      });
+
+      // Count by status
       switch (result.status) {
         case "pass":
-          summary.pass++;
+          summary.passed++;
           break;
         case "fail":
-          summary.fail++;
+          summary.failed++;
           break;
         case "dna":
           summary.dna++;
@@ -353,6 +380,11 @@ class TestProcessor {
           break;
       }
     });
+
+    // Calculate completion percentage
+    summary.completion = summary.totalTests > 0
+      ? Math.round((results.length / summary.totalTests) * 100)
+      : 0;
 
     return summary;
   }
