@@ -99,18 +99,24 @@ class AutomationEngine {
                     // Test if we can access the iframe content (CORS check)
                     const doc = this.targetFrame.contentDocument;
                     if (!doc) {
-                        reject(new Error('Cannot access page content (CORS restriction)'));
+                        reject(new Error('CORS Error: Cannot access page content.\n\nSolution: Use an HTTP server:\n• Python: python3 -m http.server 8000\n• VS Code: Install "Live Server" extension\n• Node: npx http-server\n\nThen open http://localhost:8000'));
                         return;
                     }
                     resolve(true);
                 } catch (e) {
-                    reject(new Error('Cannot access page content (CORS restriction)'));
+                    // Provide helpful error message
+                    const isFileProtocol = window.location.protocol === 'file:';
+                    const helpMessage = isFileProtocol
+                        ? 'CORS Error: You are using file:// protocol.\n\nYou MUST use an HTTP server:\n\n1. Open terminal in this folder\n2. Run: python3 -m http.server 8000\n3. Open: http://localhost:8000\n\nAlternatively, use VS Code Live Server extension.'
+                        : 'CORS Error: The target page blocks iframe access.\n\nTry testing a different page or check the page\'s X-Frame-Options header.';
+
+                    reject(new Error(helpMessage));
                 }
             };
 
             this.targetFrame.onerror = () => {
                 clearTimeout(timeout);
-                reject(new Error('Failed to load page'));
+                reject(new Error('Failed to load page. Check the URL and try again.'));
             };
 
             this.targetFrame.src = url;

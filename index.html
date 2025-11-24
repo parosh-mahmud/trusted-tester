@@ -81,8 +81,20 @@
                                 <p>This tool implements the official DHS Trusted Tester methodology for Section 508
                                     conformance testing with powerful automated scanning capabilities.</p>
 
+                                <div class="quick-start" style="background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin-bottom: 20px;">
+                                    <h4 style="margin-top: 0;">⚠️ IMPORTANT: HTTP Server Required</h4>
+                                    <p style="margin-bottom: 10px;">This tool <strong>MUST be served via HTTP server</strong> (not file://) due to browser CORS security.</p>
+                                    <p style="margin-bottom: 5px;"><strong>Quick Start:</strong></p>
+                                    <ol style="margin-bottom: 10px;">
+                                        <li>Run: <code>python3 -m http.server 8000</code></li>
+                                        <li>Open: <code>http://localhost:8000</code></li>
+                                        <li>Or use <code>START_SERVER.sh</code> (Linux/Mac) or <code>START_SERVER.bat</code> (Windows)</li>
+                                    </ol>
+                                    <p style="margin: 0; font-size: 0.9em; color: #856404;">If you see CORS errors, you're using file:// protocol. Switch to HTTP server!</p>
+                                </div>
+
                                 <div class="quick-start">
-                                    <h4>🎯 Automated Testing (Recommended):</h4>
+                                    <h4>🎯 Automated Testing:</h4>
                                     <ol>
                                         <li>Enter the URL of the page to test (try <code>test-page.html</code> for demo)</li>
                                         <li>Click <strong>"Run Automated Scan"</strong> - Done! 🎉</li>
@@ -217,7 +229,7 @@
     <script src="js/test-processes.js?v=3"></script>
     <script src="js/evaluation-engine.js?v=2"></script>
     <script src="js/report-generator.js?v=2"></script>
-    <script src="js/automation-engine.js?v=1"></script>
+    <script src="js/automation-engine.js?v=2"></script>
     <script src="js/main.js?v=3"></script>
 </body>
 

@@ -36,16 +36,41 @@ A comprehensive web accessibility testing tool that implements the DHS (Departme
 
 ---
 
+## ⚠️ **IMPORTANT: Use HTTP Server**
+
+**The tool MUST be served via HTTP server (not file://)** due to browser CORS security.
+
+### **Quick Setup (Choose One):**
+
+```bash
+# Option 1: Python (Recommended)
+python3 -m http.server 8000
+# Then open: http://localhost:8000
+
+# Option 2: Use the startup script
+./START_SERVER.sh           # Linux/Mac
+START_SERVER.bat            # Windows
+
+# Option 3: VS Code Live Server
+# Install "Live Server" extension, right-click index.html → "Open with Live Server"
+
+# Option 4: Node.js
+npx http-server
+```
+
+---
+
 ## 🎯 Quick Start
 
 ### **Option 1: Automated Testing** (Recommended)
 
-1. **Open** `index.html` in your web browser
-2. **Enter** the URL of the page you want to test
-3. **Click** the "🚀 Run Automated Scan" button
-4. **Wait** for the scan to complete (usually 5-30 seconds)
-5. **Review** results in the Review tab
-6. **Generate** a comprehensive report
+1. **Start HTTP server** (see above)
+2. **Open** http://localhost:8000 in your browser
+3. **Enter** the URL of the page you want to test (try `test-page.html`)
+4. **Click** the "🚀 Run Automated Scan" button
+5. **Wait** for the scan to complete (usually 5-30 seconds)
+6. **Review** results in the Review tab
+7. **Generate** a comprehensive report
 
 ```
 📝 That's it! The tool automatically:
