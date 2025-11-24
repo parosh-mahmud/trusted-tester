@@ -392,6 +392,23 @@ function markTest(result) {
     }, 500);
 }
 
+// Wrapper functions for HTML onclick handlers
+function markPass() {
+    markTest('pass');
+}
+
+function markFail() {
+    markTest('fail');
+}
+
+function markDNA() {
+    markTest('dna');
+}
+
+function markNotTested() {
+    markTest('not-tested');
+}
+
 /**
  * Issue Documentation
  */
@@ -656,16 +673,33 @@ function generateReport() {
 }
 
 function exportReport(format) {
-    if (!reportGenerator || !evaluationEngine) {
-        showError('Report generator not initialized');
+    if (!window.lastAutomatedScanResults) {
+        showError('No scan results available. Run a scan first.');
         return;
     }
 
     try {
-        const results = evaluationEngine.getResults();
-        const reportType = document.getElementById('report-type')?.value || 'technical';
+        const results = window.lastAutomatedScanResults;
 
-        reportGenerator.exportReport(results, reportType, format);
+        // Create export data
+        const exportData = {
+            url: results.url,
+            timestamp: results.timestamp,
+            summary: results.summary,
+            wcagCompliance: results.wcagCompliance,
+            recommendations: results.recommendations,
+            tests: results.tests
+        };
+
+        // Export as JSON for now
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `accessibility-report-${Date.now()}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
 
         showSuccess(`Report exported as ${format.toUpperCase()}`);
     } catch (error) {
@@ -676,10 +710,11 @@ function exportReport(format) {
 
 function updateReportPreview() {
     // Auto-generate report preview when switching to report tab
-    if (evaluationEngine && reportGenerator) {
-        const results = evaluationEngine.getResults();
-        if (results && results.length > 0) {
-            generateReport();
+    if (window.lastAutomatedScanResults) {
+        // Generate report from automated scan results
+        const reportContent = document.getElementById('reportContent');
+        if (reportContent) {
+            reportContent.innerHTML = '<p>Switch to this tab after running a scan to generate a report.</p>';
         }
     }
 }
@@ -700,6 +735,15 @@ function setupReferenceTab() {
     }
 }
 
+function loadReferenceData() {
+    // Load reference materials on tab switch
+    const referenceContent = document.getElementById('referenceContent');
+    if (!referenceContent) return;
+
+    // Show all tests by default
+    displayAllTests();
+}
+
 function searchReference() {
     const searchTerm = document.getElementById('reference-search')?.value.toLowerCase();
 
@@ -712,35 +756,39 @@ function searchReference() {
     // Search through test database
     const results = [];
 
-    testCategories.forEach(category => {
-        category.tests.forEach(test => {
-            const searchableText = `
-                ${test.id}
-                ${test.title}
-                ${test.description}
-                ${test.wcagCriteria.join(' ')}
-                ${test.instructions.join(' ')}
-            `.toLowerCase();
+    if (typeof TestDatabase !== 'undefined' && TestDatabase.categories) {
+        TestDatabase.categories.forEach(category => {
+            category.tests.forEach(testId => {
+                const test = TestDatabase.tests[testId];
+                if (!test) return;
 
-            if (searchableText.includes(searchTerm)) {
-                results.push({
-                    category: category.name,
-                    test: test
-                });
-            }
+                const searchableText = `
+                    ${test.id}
+                    ${test.title}
+                    ${test.wcag || ''}
+                    ${test.description || ''}
+                `.toLowerCase();
+
+                if (searchableText.includes(searchTerm)) {
+                    results.push({
+                        category: category.name,
+                        test: test
+                    });
+                }
+            });
         });
-    });
+    }
 
     displaySearchResults(results);
 }
 
 function displaySearchResults(results) {
-    const referenceList = document.getElementById('reference-list');
+    const referenceContent = document.getElementById('referenceContent');
 
-    if (!referenceList) return;
+    if (!referenceContent) return;
 
     if (results.length === 0) {
-        referenceList.innerHTML = '<p>No results found</p>';
+        referenceContent.innerHTML = '<p>No results found</p>';
         return;
     }
 
@@ -751,41 +799,48 @@ function displaySearchResults(results) {
             <div class="reference-item">
                 <h4>${result.test.id}: ${result.test.title}</h4>
                 <p><strong>Category:</strong> ${result.category}</p>
-                <p><strong>WCAG:</strong> ${result.test.wcagCriteria.join(', ')}</p>
-                <p>${result.test.description}</p>
+                <p><strong>WCAG:</strong> ${result.test.wcag || 'N/A'}</p>
+                <p>${result.test.description || ''}</p>
             </div>
         `;
     });
 
     html += '</div>';
 
-    referenceList.innerHTML = html;
+    referenceContent.innerHTML = html;
 }
 
 function displayAllTests() {
-    const referenceList = document.getElementById('reference-list');
+    const referenceContent = document.getElementById('referenceContent');
 
-    if (!referenceList) return;
+    if (!referenceContent) return;
 
     let html = '<div class="all-tests">';
 
-    testCategories.forEach(category => {
-        html += `<h3>${category.name}</h3>`;
+    if (typeof TestDatabase !== 'undefined' && TestDatabase.categories) {
+        TestDatabase.categories.forEach(category => {
+            html += `<h3>${category.name}</h3>`;
 
-        category.tests.forEach(test => {
-            html += `
-                <div class="reference-item">
-                    <h4>${test.id}: ${test.title}</h4>
-                    <p><strong>WCAG:</strong> ${test.wcagCriteria.join(', ')}</p>
-                    <p>${test.description}</p>
-                </div>
-            `;
+            category.tests.forEach(testId => {
+                const test = TestDatabase.tests[testId];
+                if (!test) return;
+
+                html += `
+                    <div class="reference-item">
+                        <h4>${test.id}: ${test.title}</h4>
+                        <p><strong>WCAG:</strong> ${test.wcag || 'N/A'}</p>
+                        <p>${test.description || ''}</p>
+                    </div>
+                `;
+            });
         });
-    });
+    } else {
+        html += '<p>Test database not loaded</p>';
+    }
 
     html += '</div>';
 
-    referenceList.innerHTML = html;
+    referenceContent.innerHTML = html;
 }
 
 /**
