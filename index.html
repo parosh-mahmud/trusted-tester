@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trusted Tester v5.1.3 - Section 508 Conformance Testing</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/test-interface.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-content">
+                <h1>🔍 Trusted Tester Conformance Test Process</h1>
+                <p>Section 508 Testing Tool - Version 5.1.3 (December 2023)</p>
+                <div class="header-meta">
+                    <span class="badge">DHS Methodology</span>
+                    <span class="badge">WCAG 2.0 Level AA</span>
+                    <span class="badge">Revised Section 508</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="test-navigation">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="testing">📋 Testing</button>
+                <button class="nav-tab" data-tab="review">📊 Review</button>
+                <button class="nav-tab" data-tab="report">📄 Report</button>
+                <button class="nav-tab" data-tab="reference">📚 Reference</button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Testing Tab -->
+            <div class="tab-content active" id="testing-tab">
+                <div class="testing-layout">
+                    <!-- Test Categories Panel -->
+                    <aside class="test-categories">
+                        <h2>Test Categories</h2>
+                        <div class="category-list" id="categoryList">
+                            <!-- Categories will be populated dynamically -->
+                        </div>
+                        <div class="test-progress">
+                            <h3>Overall Progress</h3>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <span class="progress-text" id="progressText">0/0 Tests Complete</span>
+                        </div>
+                    </aside>
+
+                    <!-- Test Execution Panel -->
+                    <section class="test-execution">
+                        <div class="test-header">
+                            <h2 id="currentTestTitle">Select a Test to Begin</h2>
+                            <div class="test-meta" id="testMeta"></div>
+                        </div>
+
+                        <!-- URL Input -->
+                        <div class="url-input-section">
+                            <label for="testUrl">Web Page URL:</label>
+                            <input type="url" id="testUrl" placeholder="https://example.com/page-to-test">
+                            <button onclick="loadPage()" class="btn-primary">Load Page</button>
+                        </div>
+
+                        <!-- Test Content -->
+                        <div class="test-content" id="testContent">
+                            <div class="welcome-message">
+                                <h3>Welcome to Trusted Tester v5.1.3</h3>
+                                <p>This tool implements the official DHS Trusted Tester methodology for Section 508
+                                    conformance testing.</p>
+
+                                <div class="quick-start">
+                                    <h4>Quick Start:</h4>
+                                    <ol>
+                                        <li>Enter the URL of the page to test</li>
+                                        <li>Select a test category from the left panel</li>
+                                        <li>Follow the test instructions</li>
+                                        <li>Record your findings</li>
+                                        <li>Generate a conformance report</li>
+                                    </ol>
+                                </div>
+
+                                <div class="test-overview">
+                                    <h4>20 Test Categories:</h4>
+                                    <p>The Trusted Tester process includes comprehensive testing across all aspects of
+                                        web accessibility.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Test Controls -->
+                        <div class="test-controls" id="testControls" style="display: none;">
+                            <button onclick="markPass()" class="btn-pass">✅ Pass</button>
+                            <button onclick="markFail()" class="btn-fail">❌ Fail</button>
+                            <button onclick="markDNA()" class="btn-dna">➖ Does Not Apply</button>
+                            <button onclick="markNotTested()" class="btn-not-tested">⏭️ Not Tested</button>
+                        </div>
+
+                        <!-- Issue Documentation -->
+                        <div class="issue-form" id="issueForm" style="display: none;">
+                            <h3>Document Issue</h3>
+                            <textarea id="issueDescription" placeholder="Describe the issue found..."></textarea>
+                            <input type="text" id="issueLocation"
+                                placeholder="Element/Location (e.g., main navigation menu)">
+                            <select id="issueSeverity">
+                                <option value="">Select Severity</option>
+                                <option value="critical">Critical</option>
+                                <option value="major">Major</option>
+                                <option value="minor">Minor</option>
+                            </select>
+                            <button onclick="saveIssue()" class="btn-primary">Save Issue</button>
+                        </div>
+                    </section>
+
+                    <!-- Tools Panel -->
+                    <aside class="tools-panel">
+                        <h2>Testing Tools</h2>
+
+                        <div class="tool-section">
+                            <h3>🛠️ Required Tools</h3>
+                            <ul class="tool-list">
+                                <li><a href="#" onclick="openANDI()">ANDI</a></li>
+                                <li><a href="#" onclick="openCCA()">Colour Contrast Analyser</a></li>
+                                <li><a href="#" onclick="openDevTools()">Browser DevTools</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="tool-section">
+                            <h3>⌨️ Keyboard Testing</h3>
+                            <div class="keyboard-guide">
+                                <p><kbd>Tab</kbd> - Navigate forward</p>
+                                <p><kbd>Shift+Tab</kbd> - Navigate backward</p>
+                                <p><kbd>Enter</kbd> - Activate button/link</p>
+                                <p><kbd>Space</kbd> - Check box/button</p>
+                                <p><kbd>Arrow Keys</kbd> - Radio/Menu</p>
+                            </div>
+                        </div>
+
+                        <div class="tool-section">
+                            <h3>📝 Quick Notes</h3>
+                            <textarea id="quickNotes" placeholder="Testing notes..."></textarea>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- Review Tab -->
+            <div class="tab-content" id="review-tab">
+                <div class="review-container">
+                    <h2>Test Results Review</h2>
+                    <div class="results-summary" id="resultsSummary">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Tab -->
+            <div class="tab-content" id="report-tab">
+                <div class="report-container">
+                    <h2>Conformance Report</h2>
+                    <div class="report-actions">
+                        <button onclick="generateReport()" class="btn-primary">Generate Report</button>
+                        <button onclick="exportReport('pdf')" class="btn-secondary">Export PDF</button>
+                        <button onclick="exportReport('excel')" class="btn-secondary">Export Excel</button>
+                    </div>
+                    <div class="report-content" id="reportContent">
+                        <!-- Report will be generated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reference Tab -->
+            <div class="tab-content" id="reference-tab">
+                <div class="reference-container">
+                    <h2>Testing Reference</h2>
+                    <div class="reference-search">
+                        <input type="text" id="referenceSearch"
+                            placeholder="Search tests, WCAG criteria, or keywords...">
+                    </div>
+                    <div class="reference-content" id="referenceContent">
+                        <!-- Reference content will be populated -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/test-database.js?v=2"></script>
+    <script src="js/test-processes.js?v=2"></script>
+    <script src="js/evaluation-engine.js?v=2"></script>
+    <script src="js/report-generator.js?v=2"></script>
+    <script src="js/main.js?v=2"></script>
+</body>
+
+</html>

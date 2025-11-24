@@ -1,0 +1,513 @@
+{
+  "metadata": {
+    "version": "5.0",
+    "title": "Trusted Tester Conformance Test Process",
+    "standard": "Section 508 / WCAG 2.0 Level AA",
+    "lastUpdated": "2024-11-24",
+    "description": "DHS Trusted Tester methodology for evaluating web accessibility compliance"
+  },
+  "testCategories": [
+    {
+      "id": "cat-1",
+      "name": "Conforming Alternate Version",
+      "description": "Tests for conforming alternate versions of web content",
+      "priority": "critical",
+      "totalTests": 1
+    },
+    {
+      "id": "cat-2",
+      "name": "Auto-Playing and Auto-Updating Content",
+      "description": "Tests for content that plays automatically or updates without user interaction",
+      "priority": "high",
+      "totalTests": 1
+    },
+    {
+      "id": "cat-3",
+      "name": "Flashing",
+      "description": "Tests for content that flashes more than 3 times per second",
+      "priority": "critical",
+      "totalTests": 1
+    },
+    {
+      "id": "cat-4",
+      "name": "Keyboard Access and Focus",
+      "description": "Tests for keyboard accessibility and focus management",
+      "priority": "critical",
+      "totalTests": 7
+    },
+    {
+      "id": "cat-5",
+      "name": "Forms",
+      "description": "Tests for form accessibility including labels, instructions, and error handling",
+      "priority": "critical",
+      "totalTests": 9
+    },
+    {
+      "id": "cat-6",
+      "name": "Links and Buttons",
+      "description": "Tests for link and button accessibility",
+      "priority": "high",
+      "totalTests": 1
+    },
+    {
+      "id": "cat-7",
+      "name": "Images",
+      "description": "Tests for image alternative text and accessibility",
+      "priority": "critical",
+      "totalTests": 4
+    },
+    {
+      "id": "cat-8",
+      "name": "Adjustable Time Limits",
+      "description": "Tests for content with time limits and user control",
+      "priority": "critical",
+      "totalTests": 1
+    },
+    {
+      "id": "cat-9",
+      "name": "Repetitive Content",
+      "description": "Tests for bypass mechanisms for repetitive content",
+      "priority": "high",
+      "totalTests": 1
+    },
+    {
+      "id": "cat-10",
+      "name": "Content Structure",
+      "description": "Tests for proper content structure including headings and lists",
+      "priority": "high",
+      "totalTests": 4
+    },
+    {
+      "id": "cat-11",
+      "name": "Language",
+      "description": "Tests for language identification",
+      "priority": "medium",
+      "totalTests": 1
+    },
+    {
+      "id": "cat-12",
+      "name": "Page Titles, Frames, and iFrames",
+      "description": "Tests for page titles and frame accessibility",
+      "priority": "high",
+      "totalTests": 4
+    },
+    {
+      "id": "cat-13",
+      "name": "Sensory Characteristics and Contrast",
+      "description": "Tests for sensory characteristics and color contrast",
+      "priority": "high",
+      "totalTests": 3
+    },
+    {
+      "id": "cat-14",
+      "name": "Tables",
+      "description": "Tests for data table accessibility",
+      "priority": "high",
+      "totalTests": 3
+    },
+    {
+      "id": "cat-15",
+      "name": "CSS Content and Positioning",
+      "description": "Tests for CSS-generated content and positioning",
+      "priority": "medium",
+      "totalTests": 1
+    },
+    {
+      "id": "cat-16",
+      "name": "Pre-Recorded Audio-Only and Video-Only",
+      "description": "Tests for pre-recorded media alternatives",
+      "priority": "high",
+      "totalTests": 1
+    },
+    {
+      "id": "cat-17",
+      "name": "Synchronized Media",
+      "description": "Tests for synchronized multimedia accessibility",
+      "priority": "high",
+      "totalTests": 1
+    },
+    {
+      "id": "cat-18",
+      "name": "Resize Text",
+      "description": "Tests for text resizing without loss of content or functionality",
+      "priority": "medium",
+      "totalTests": 1
+    },
+    {
+      "id": "cat-19",
+      "name": "Multiple Ways",
+      "description": "Tests for multiple ways to find content",
+      "priority": "medium",
+      "totalTests": 1
+    },
+    {
+      "id": "cat-20",
+      "name": "Parsing",
+      "description": "Tests for proper HTML parsing",
+      "priority": "high",
+      "totalTests": 1
+    }
+  ],
+  "wcagCriteria": {
+    "1.1.1": {
+      "level": "A",
+      "title": "Non-text Content",
+      "description": "All non-text content has a text alternative"
+    },
+    "1.2.1": {
+      "level": "A",
+      "title": "Audio-only and Video-only (Prerecorded)",
+      "description": "Alternatives provided for prerecorded audio-only and video-only content"
+    },
+    "1.2.2": {
+      "level": "A",
+      "title": "Captions (Prerecorded)",
+      "description": "Captions provided for prerecorded audio in synchronized media"
+    },
+    "1.2.3": {
+      "level": "A",
+      "title": "Audio Description or Media Alternative (Prerecorded)",
+      "description": "Audio description or media alternative provided for video"
+    },
+    "1.2.4": {
+      "level": "AA",
+      "title": "Captions (Live)",
+      "description": "Captions provided for live audio in synchronized media"
+    },
+    "1.2.5": {
+      "level": "AA",
+      "title": "Audio Description (Prerecorded)",
+      "description": "Audio description provided for video content"
+    },
+    "1.3.1": {
+      "level": "A",
+      "title": "Info and Relationships",
+      "description": "Information, structure, and relationships can be programmatically determined"
+    },
+    "1.3.2": {
+      "level": "A",
+      "title": "Meaningful Sequence",
+      "description": "Correct reading sequence can be programmatically determined"
+    },
+    "1.3.3": {
+      "level": "A",
+      "title": "Sensory Characteristics",
+      "description": "Instructions don't rely solely on sensory characteristics"
+    },
+    "1.4.1": {
+      "level": "A",
+      "title": "Use of Color",
+      "description": "Color is not the only visual means of conveying information"
+    },
+    "1.4.2": {
+      "level": "A",
+      "title": "Audio Control",
+      "description": "Mechanism to pause or stop auto-playing audio"
+    },
+    "1.4.3": {
+      "level": "AA",
+      "title": "Contrast (Minimum)",
+      "description": "Text has contrast ratio of at least 4.5:1"
+    },
+    "1.4.4": {
+      "level": "AA",
+      "title": "Resize Text",
+      "description": "Text can be resized up to 200% without loss of content or functionality"
+    },
+    "1.4.5": {
+      "level": "AA",
+      "title": "Images of Text",
+      "description": "Text used instead of images of text where possible"
+    },
+    "2.1.1": {
+      "level": "A",
+      "title": "Keyboard",
+      "description": "All functionality available from a keyboard"
+    },
+    "2.1.2": {
+      "level": "A",
+      "title": "No Keyboard Trap",
+      "description": "Keyboard focus can be moved away from components"
+    },
+    "2.2.1": {
+      "level": "A",
+      "title": "Timing Adjustable",
+      "description": "User can turn off, adjust, or extend time limits"
+    },
+    "2.2.2": {
+      "level": "A",
+      "title": "Pause, Stop, Hide",
+      "description": "User can pause, stop, or hide moving, blinking, or auto-updating content"
+    },
+    "2.3.1": {
+      "level": "A",
+      "title": "Three Flashes or Below Threshold",
+      "description": "Content does not flash more than three times per second"
+    },
+    "2.4.1": {
+      "level": "A",
+      "title": "Bypass Blocks",
+      "description": "Mechanism to bypass blocks of repeated content"
+    },
+    "2.4.2": {
+      "level": "A",
+      "title": "Page Titled",
+      "description": "Web pages have descriptive titles"
+    },
+    "2.4.3": {
+      "level": "A",
+      "title": "Focus Order",
+      "description": "Components receive focus in order that preserves meaning"
+    },
+    "2.4.4": {
+      "level": "A",
+      "title": "Link Purpose (In Context)",
+      "description": "Purpose of each link can be determined from link text or context"
+    },
+    "2.4.5": {
+      "level": "AA",
+      "title": "Multiple Ways",
+      "description": "More than one way to locate a web page within a set"
+    },
+    "2.4.6": {
+      "level": "AA",
+      "title": "Headings and Labels",
+      "description": "Headings and labels describe topic or purpose"
+    },
+    "2.4.7": {
+      "level": "AA",
+      "title": "Focus Visible",
+      "description": "Keyboard focus indicator is visible"
+    },
+    "3.1.1": {
+      "level": "A",
+      "title": "Language of Page",
+      "description": "Default language can be programmatically determined"
+    },
+    "3.1.2": {
+      "level": "AA",
+      "title": "Language of Parts",
+      "description": "Language of each passage can be programmatically determined"
+    },
+    "3.2.1": {
+      "level": "A",
+      "title": "On Focus",
+      "description": "Components do not change context on receiving focus"
+    },
+    "3.2.2": {
+      "level": "A",
+      "title": "On Input",
+      "description": "Changing component settings does not cause unexpected context change"
+    },
+    "3.2.3": {
+      "level": "AA",
+      "title": "Consistent Navigation",
+      "description": "Navigation mechanisms are consistent across pages"
+    },
+    "3.2.4": {
+      "level": "AA",
+      "title": "Consistent Identification",
+      "description": "Components with same functionality are identified consistently"
+    },
+    "3.3.1": {
+      "level": "A",
+      "title": "Error Identification",
+      "description": "Errors are identified and described to user in text"
+    },
+    "3.3.2": {
+      "level": "A",
+      "title": "Labels or Instructions",
+      "description": "Labels or instructions provided for user input"
+    },
+    "3.3.3": {
+      "level": "AA",
+      "title": "Error Suggestion",
+      "description": "Suggestions provided when errors are detected"
+    },
+    "3.3.4": {
+      "level": "AA",
+      "title": "Error Prevention (Legal, Financial, Data)",
+      "description": "Submissions can be reversed, checked, or confirmed"
+    },
+    "4.1.1": {
+      "level": "A",
+      "title": "Parsing",
+      "description": "Content can be parsed unambiguously"
+    },
+    "4.1.2": {
+      "level": "A",
+      "title": "Name, Role, Value",
+      "description": "Name and role can be programmatically determined"
+    }
+  },
+  "testingTools": [
+    {
+      "id": "andi",
+      "name": "ANDI",
+      "fullName": "Accessible Name & Description Inspector",
+      "url": "https://www.ssa.gov/accessibility/andi/",
+      "description": "Bookmarklet tool for testing accessibility",
+      "type": "bookmarklet",
+      "required": true
+    },
+    {
+      "id": "cca",
+      "name": "CCA",
+      "fullName": "Colour Contrast Analyser",
+      "url": "https://www.tpgi.com/color-contrast-checker/",
+      "description": "Tool for testing color contrast ratios",
+      "type": "desktop-app",
+      "required": true
+    },
+    {
+      "id": "devtools",
+      "name": "Browser DevTools",
+      "fullName": "Browser Developer Tools",
+      "description": "Built-in browser developer tools for inspecting HTML",
+      "type": "browser-builtin",
+      "required": true
+    },
+    {
+      "id": "screen-reader",
+      "name": "Screen Reader",
+      "fullName": "Screen Reader Software",
+      "description": "JAWS, NVDA, or VoiceOver for testing with assistive technology",
+      "type": "desktop-app",
+      "required": false
+    }
+  ],
+  "severityLevels": {
+    "critical": {
+      "name": "Critical",
+      "description": "Prevents access to content or functionality",
+      "color": "#dc3545",
+      "priority": 1
+    },
+    "high": {
+      "name": "High",
+      "description": "Significantly impairs access to content or functionality",
+      "color": "#fd7e14",
+      "priority": 2
+    },
+    "medium": {
+      "name": "Medium",
+      "description": "Moderately impairs access to content or functionality",
+      "color": "#ffc107",
+      "priority": 3
+    },
+    "low": {
+      "name": "Low",
+      "description": "Minor accessibility issue",
+      "color": "#17a2b8",
+      "priority": 4
+    }
+  },
+  "testOutcomes": {
+    "pass": {
+      "label": "Pass",
+      "description": "Test requirement is met",
+      "icon": "",
+      "color": "#28a745"
+    },
+    "fail": {
+      "label": "Fail",
+      "description": "Test requirement is not met",
+      "icon": "",
+      "color": "#dc3545"
+    },
+    "dna": {
+      "label": "Does Not Apply",
+      "description": "Test requirement does not apply to this content",
+      "icon": "N/A",
+      "color": "#6c757d"
+    },
+    "not-tested": {
+      "label": "Not Tested",
+      "description": "Test has not been performed yet",
+      "icon": "?",
+      "color": "#adb5bd"
+    }
+  },
+  "reportTypes": [
+    {
+      "id": "executive",
+      "name": "Executive Summary",
+      "description": "High-level overview for stakeholders",
+      "audience": "management"
+    },
+    {
+      "id": "technical",
+      "name": "Technical Report",
+      "description": "Detailed technical findings for developers",
+      "audience": "developers"
+    },
+    {
+      "id": "vpat",
+      "name": "VPAT (Voluntary Product Accessibility Template)",
+      "description": "Standardized accessibility conformance report",
+      "audience": "procurement"
+    },
+    {
+      "id": "remediation",
+      "name": "Remediation Guide",
+      "description": "Step-by-step instructions for fixing issues",
+      "audience": "developers"
+    },
+    {
+      "id": "summary",
+      "name": "Summary Report",
+      "description": "Concise overview of test results",
+      "audience": "general"
+    },
+    {
+      "id": "detailed",
+      "name": "Detailed Report",
+      "description": "Comprehensive report with all test details",
+      "audience": "testers"
+    }
+  ],
+  "exportFormats": [
+    {
+      "id": "html",
+      "name": "HTML",
+      "extension": ".html",
+      "mimeType": "text/html"
+    },
+    {
+      "id": "pdf",
+      "name": "PDF",
+      "extension": ".pdf",
+      "mimeType": "application/pdf"
+    },
+    {
+      "id": "excel",
+      "name": "Excel",
+      "extension": ".xlsx",
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    {
+      "id": "json",
+      "name": "JSON",
+      "extension": ".json",
+      "mimeType": "application/json"
+    },
+    {
+      "id": "csv",
+      "name": "CSV",
+      "extension": ".csv",
+      "mimeType": "text/csv"
+    },
+    {
+      "id": "xml",
+      "name": "XML",
+      "extension": ".xml",
+      "mimeType": "application/xml"
+    },
+    {
+      "id": "markdown",
+      "name": "Markdown",
+      "extension": ".md",
+      "mimeType": "text/markdown"
+    }
+  ]
+}
