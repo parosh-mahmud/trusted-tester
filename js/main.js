@@ -7,7 +7,9 @@
 var testProcessor = null;
 var evaluationEngine = null;
 var reportGenerator = null;
+var automationEngine = null;
 var currentPage = null;
+var isAutomatedMode = false;
 
 // Initialize application when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
@@ -29,6 +31,16 @@ function initializeApplication() {
 
         // Initialize report generator
         reportGenerator = new TrustedTesterReportGenerator();
+
+        // Initialize automation engine
+        automationEngine = new AutomationEngine();
+        automationEngine.initialize().then(() => {
+            console.log('Automation engine ready');
+            showSuccess('Automated testing enabled ✓');
+        }).catch(err => {
+            console.error('Automation engine initialization failed:', err);
+            showError('Automated testing unavailable');
+        });
 
         // Load test categories into the UI
         testProcessor.initializeCategories();
@@ -73,7 +85,7 @@ function setupEventListeners() {
  * Tab Navigation
  */
 function setupTabNavigation() {
-    const tabs = document.querySelectorAll('.tab');
+    const tabs = document.querySelectorAll('.nav-tab');
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {
             switchTab(this.dataset.tab);
@@ -83,16 +95,22 @@ function setupTabNavigation() {
 
 function switchTab(tabName) {
     // Update active tab
-    document.querySelectorAll('.tab').forEach(tab => {
+    document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.classList.remove('active');
     });
-    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    const activeTab = document.querySelector(`[data-tab="${tabName}"]`);
+    if (activeTab) {
+        activeTab.classList.add('active');
+    }
 
     // Update active content
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
     });
-    document.getElementById(`${tabName}-tab`).classList.add('active');
+    const activeContent = document.getElementById(`${tabName}-tab`);
+    if (activeContent) {
+        activeContent.classList.add('active');
+    }
 
     // Perform tab-specific actions
     switch(tabName) {
@@ -133,19 +151,23 @@ function loadPage() {
     }
 
     // Validate URL format
+    let validUrl = url;
     try {
-        new URL(url);
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            validUrl = 'https://' + url;
+        }
+        new URL(validUrl);
     } catch (error) {
-        showError('Invalid URL format. Please include http:// or https://');
+        showError('Invalid URL format. Please enter a valid URL');
         return;
     }
 
-    currentPage = url;
+    currentPage = validUrl;
 
     // Initialize evaluation for this page
     if (evaluationEngine) {
         evaluationEngine.initializeEvaluation({
-            url: url,
+            url: validUrl,
             title: document.title || 'Untested Page',
             timestamp: new Date().toISOString()
         });
@@ -154,13 +176,161 @@ function loadPage() {
     // Update UI to show page is loaded
     const pageTitle = document.getElementById('current-page-title');
     if (pageTitle) {
-        pageTitle.textContent = url;
+        pageTitle.textContent = validUrl;
     }
 
-    showSuccess(`Page loaded: ${url}`);
+    showSuccess(`Page loaded: ${validUrl}`);
 
     // Enable test controls
     enableTestControls();
+
+    // Enable automated scan button
+    const autoScanBtn = document.getElementById('run-automated-scan');
+    if (autoScanBtn) {
+        autoScanBtn.disabled = false;
+    }
+}
+
+/**
+ * Run automated accessibility scan
+ */
+async function runAutomatedScan() {
+    if (!currentPage) {
+        showError('Please load a page first');
+        return;
+    }
+
+    if (!automationEngine) {
+        showError('Automation engine not initialized');
+        return;
+    }
+
+    try {
+        // Show progress
+        showInfo('Starting automated scan...');
+        const scanBtn = document.getElementById('run-automated-scan');
+        const scanProgress = document.getElementById('scan-progress');
+
+        if (scanBtn) {
+            scanBtn.disabled = true;
+            scanBtn.textContent = 'Scanning...';
+        }
+
+        if (scanProgress) {
+            scanProgress.style.display = 'block';
+            scanProgress.innerHTML = `
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 10%"></div>
+                </div>
+                <p>Loading page...</p>
+            `;
+        }
+
+        // Run the full scan
+        const results = await automationEngine.runFullScan(currentPage);
+
+        // Update progress
+        if (scanProgress) {
+            scanProgress.innerHTML = `
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%"></div>
+                </div>
+                <p>Scan complete!</p>
+            `;
+        }
+
+        // Process results
+        processAutomatedResults(results);
+
+        // Show summary
+        showSuccess(`Scan complete: ${results.summary.violations} violations found`);
+
+        // Switch to review tab to show results
+        setTimeout(() => {
+            switchTab('review');
+        }, 1000);
+
+    } catch (error) {
+        console.error('Automated scan error:', error);
+        showError(`Scan failed: ${error.message}`);
+    } finally {
+        // Reset button
+        const scanBtn = document.getElementById('run-automated-scan');
+        if (scanBtn) {
+            scanBtn.disabled = false;
+            scanBtn.textContent = '🚀 Run Automated Scan';
+        }
+
+        // Hide progress after delay
+        setTimeout(() => {
+            const scanProgress = document.getElementById('scan-progress');
+            if (scanProgress) {
+                scanProgress.style.display = 'none';
+            }
+        }, 2000);
+    }
+}
+
+/**
+ * Process automated scan results and populate test results
+ */
+function processAutomatedResults(results) {
+    if (!results || !results.tests) {
+        console.error('Invalid scan results');
+        return;
+    }
+
+    isAutomatedMode = true;
+
+    // Record each test result
+    Object.entries(results.tests).forEach(([testId, testResult]) => {
+        const outcome = testResult.result === 'fail' ? 'FAIL' : 'PASS';
+        const notes = testResult.automated ?
+            `[AUTOMATED] ${testResult.issues.length} issues found` :
+            testResult.notes || '';
+
+        // Record in test processor
+        if (testProcessor) {
+            testProcessor.recordResult(testId, outcome.toLowerCase(), notes);
+        }
+
+        // Record in evaluation engine
+        if (evaluationEngine) {
+            evaluationEngine.recordTestResult(testId, {
+                outcome: outcome,
+                notes: notes,
+                timestamp: new Date().toISOString(),
+                automated: true
+            });
+
+            // Record issues for failed tests
+            if (testResult.issues && testResult.issues.length > 0) {
+                testResult.issues.forEach(issue => {
+                    evaluationEngine.recordIssue({
+                        testId: testId,
+                        title: issue.description || issue.issue,
+                        description: issue.help || issue.failureSummary || '',
+                        severity: issue.impact || 'moderate',
+                        recommendation: issue.helpUrl || '',
+                        element: issue.element || issue.target || '',
+                        timestamp: new Date().toISOString(),
+                        pageUrl: currentPage,
+                        automated: true
+                    });
+                });
+            }
+        }
+    });
+
+    // Update progress display
+    if (testProcessor) {
+        testProcessor.updateProgress();
+    }
+
+    // Store full results
+    window.lastAutomatedScanResults = results;
+
+    showSuccess('Automated results processed');
 }
 
 /**
@@ -320,53 +490,130 @@ function setupReviewTab() {
 }
 
 function loadReviewData() {
-    if (!testProcessor) return;
+    const resultsContainer = document.getElementById('resultsSummary');
 
-    const summary = testProcessor.generateSummary();
-    const resultsTable = document.getElementById('results-table');
+    if (!resultsContainer) return;
 
-    if (resultsTable) {
-        let html = `
-            <table>
-                <thead>
-                    <tr>
-                        <th>Test ID</th>
-                        <th>Test Name</th>
-                        <th>Result</th>
-                        <th>Notes</th>
-                        <th>Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody>
+    let html = '<div class="review-content">';
+
+    // Show automated scan results if available
+    if (window.lastAutomatedScanResults) {
+        const results = window.lastAutomatedScanResults;
+
+        html += `
+            <div class="automated-results-summary">
+                <h3>🚀 Automated Scan Results</h3>
+                <div class="scan-meta">
+                    <p><strong>URL:</strong> ${results.url}</p>
+                    <p><strong>Scan Date:</strong> ${new Date(results.timestamp).toLocaleString()}</p>
+                    <p><strong>Compliance Level:</strong> ${results.wcagCompliance?.level || 'Analyzing...'}</p>
+                </div>
+
+                <div class="results-stats">
+                    <div class="stat-card stat-violations">
+                        <h4>${results.summary.violations}</h4>
+                        <p>Violations</p>
+                    </div>
+                    <div class="stat-card stat-passes">
+                        <h4>${results.summary.passes}</h4>
+                        <p>Passed</p>
+                    </div>
+                    <div class="stat-card stat-issues">
+                        <h4>${results.summary.totalIssues}</h4>
+                        <p>Total Issues</p>
+                    </div>
+                </div>
+
+                <h4>Top Issues (Priority Order):</h4>
+                <div class="recommendations-list">
         `;
 
-        summary.results.forEach(result => {
+        // Display top 10 recommendations
+        results.recommendations.slice(0, 10).forEach((rec, index) => {
             html += `
-                <tr class="result-${result.status}">
-                    <td>${result.testId}</td>
-                    <td>${result.testName}</td>
-                    <td><span class="badge badge-${result.status}">${result.status}</span></td>
-                    <td>${result.notes || '-'}</td>
-                    <td>${new Date(result.timestamp).toLocaleString()}</td>
-                </tr>
+                <div class="recommendation-item priority-${rec.priority}">
+                    <div class="rec-header">
+                        <span class="rec-priority">${rec.priority.toUpperCase()}</span>
+                        <span class="rec-test-id">Test ${rec.testId}</span>
+                    </div>
+                    <p><strong>${rec.issue}</strong></p>
+                    <p class="rec-recommendation">${rec.recommendation}</p>
+                    ${rec.element ? `<code class="rec-element">${rec.element.substring(0, 100)}...</code>` : ''}
+                    ${rec.learnMore ? `<a href="${rec.learnMore}" target="_blank">Learn More →</a>` : ''}
+                </div>
             `;
         });
 
+        if (results.recommendations.length > 10) {
+            html += `<p class="more-results">+ ${results.recommendations.length - 10} more issues...</p>`;
+        }
+
+        html += '</div></div>';
+    }
+
+    // Show manual test results if available
+    if (testProcessor) {
+        const summary = testProcessor.generateSummary();
+
+        if (summary && summary.results && summary.results.length > 0) {
+            html += `
+                <div class="manual-results-summary">
+                    <h3>📋 Manual Test Results</h3>
+
+                    <div class="summary-stats">
+                        <p><strong>Total Tests:</strong> ${summary.totalTests}</p>
+                        <p><strong>Passed:</strong> ${summary.passed}</p>
+                        <p><strong>Failed:</strong> ${summary.failed}</p>
+                        <p><strong>Does Not Apply:</strong> ${summary.dna}</p>
+                        <p><strong>Not Tested:</strong> ${summary.notTested}</p>
+                        <p><strong>Completion:</strong> ${summary.completion}%</p>
+                    </div>
+
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Test ID</th>
+                                <th>Test Name</th>
+                                <th>Result</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            summary.results.forEach(result => {
+                html += `
+                    <tr class="result-${result.status}">
+                        <td>${result.testId}</td>
+                        <td>${result.testName}</td>
+                        <td><span class="badge badge-${result.status}">${result.status}</span></td>
+                        <td>${result.notes || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+    }
+
+    // Show empty state if no results
+    if (!window.lastAutomatedScanResults && (!testProcessor || !testProcessor.testResults || testProcessor.testResults.size === 0)) {
         html += `
-                </tbody>
-            </table>
-            <div class="summary-stats">
-                <p><strong>Total Tests:</strong> ${summary.totalTests}</p>
-                <p><strong>Passed:</strong> ${summary.passed}</p>
-                <p><strong>Failed:</strong> ${summary.failed}</p>
-                <p><strong>Does Not Apply:</strong> ${summary.dna}</p>
-                <p><strong>Not Tested:</strong> ${summary.notTested}</p>
-                <p><strong>Completion:</strong> ${summary.completion}%</p>
+            <div class="empty-state">
+                <h3>No Test Results Yet</h3>
+                <p>Run an automated scan or perform manual testing to see results here.</p>
+                <button onclick="switchTab('testing')" class="btn-primary">Start Testing</button>
             </div>
         `;
-
-        resultsTable.innerHTML = html;
     }
+
+    html += '</div>';
+
+    resultsContainer.innerHTML = html;
 }
 
 /**
@@ -647,12 +894,14 @@ window.TrustedTester = {
     testProcessor,
     evaluationEngine,
     reportGenerator,
+    automationEngine,
     loadPage,
     markTest,
     saveIssue,
     generateReport,
     exportReport,
-    switchTab
+    switchTab,
+    runAutomatedScan
 };
 
 // Make functions globally accessible for HTML onclick attributes
@@ -663,3 +912,4 @@ window.generateReport = generateReport;
 window.exportReport = exportReport;
 window.switchTab = switchTab;
 window.searchReference = searchReference;
+window.runAutomatedScan = runAutomatedScan;

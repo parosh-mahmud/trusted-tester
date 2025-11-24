@@ -64,32 +64,53 @@
                         <!-- URL Input -->
                         <div class="url-input-section">
                             <label for="testUrl">Web Page URL:</label>
-                            <input type="url" id="testUrl" placeholder="https://example.com/page-to-test">
-                            <button onclick="loadPage()" class="btn-primary">Load Page</button>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="url" id="testUrl" placeholder="https://example.com/page-to-test" style="flex: 1;">
+                                <button onclick="loadPage()" class="btn-primary">Load Page</button>
+                                <button id="run-automated-scan" onclick="runAutomatedScan()" class="btn-success" disabled style="white-space: nowrap;">🚀 Run Automated Scan</button>
+                            </div>
+                            <div id="scan-progress" style="display: none; margin-top: 10px;">
+                                <!-- Progress will be shown here -->
+                            </div>
                         </div>
 
                         <!-- Test Content -->
                         <div class="test-content" id="testContent">
                             <div class="welcome-message">
-                                <h3>Welcome to Trusted Tester v5.1.3</h3>
+                                <h3>Welcome to Trusted Tester v5.1.3 - Now with Automated Testing! 🚀</h3>
                                 <p>This tool implements the official DHS Trusted Tester methodology for Section 508
-                                    conformance testing.</p>
+                                    conformance testing with powerful automated scanning capabilities.</p>
 
                                 <div class="quick-start">
-                                    <h4>Quick Start:</h4>
+                                    <h4>🎯 Automated Testing (Recommended):</h4>
                                     <ol>
                                         <li>Enter the URL of the page to test</li>
+                                        <li>Click <strong>"Run Automated Scan"</strong> - Done! 🎉</li>
+                                        <li>Review automated results in the Review tab</li>
+                                        <li>Generate a comprehensive conformance report</li>
+                                    </ol>
+                                </div>
+
+                                <div class="quick-start">
+                                    <h4>📋 Manual Testing Mode:</h4>
+                                    <ol>
+                                        <li>Enter the URL and click "Load Page"</li>
                                         <li>Select a test category from the left panel</li>
-                                        <li>Follow the test instructions</li>
-                                        <li>Record your findings</li>
+                                        <li>Follow the step-by-step test instructions</li>
+                                        <li>Record your findings (Pass/Fail/DNA)</li>
                                         <li>Generate a conformance report</li>
                                     </ol>
                                 </div>
 
                                 <div class="test-overview">
-                                    <h4>20 Test Categories:</h4>
-                                    <p>The Trusted Tester process includes comprehensive testing across all aspects of
-                                        web accessibility.</p>
+                                    <h4>✨ Features:</h4>
+                                    <ul>
+                                        <li><strong>20 Test Categories</strong> covering all WCAG 2.1 Level AA criteria</li>
+                                        <li><strong>Automated Scanning</strong> powered by axe-core accessibility engine</li>
+                                        <li><strong>Smart Violation Detection</strong> with detailed recommendations</li>
+                                        <li><strong>WCAG & Section 508 Compliance</strong> reporting</li>
+                                        <li><strong>Export</strong> to PDF, Excel, JSON formats</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -195,7 +216,8 @@
     <script src="js/test-processes.js?v=2"></script>
     <script src="js/evaluation-engine.js?v=2"></script>
     <script src="js/report-generator.js?v=2"></script>
-    <script src="js/main.js?v=2"></script>
+    <script src="js/automation-engine.js?v=1"></script>
+    <script src="js/main.js?v=3"></script>
 </body>
 
 </html>
